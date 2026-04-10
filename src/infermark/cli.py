@@ -1,10 +1,10 @@
 """CLI for infermark."""
 
 from __future__ import annotations
-from typing import Any
 
 import sys
 from pathlib import Path
+from typing import Any
 
 try:
     import click
