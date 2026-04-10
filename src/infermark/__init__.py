@@ -30,6 +30,20 @@ from infermark.backends import (
     TGIBackend,
     detect_backend,
 )
+from infermark.load import (
+    LoadProfile,
+    LoadResult,
+    LoadTestPlan,
+    LoadTestRunner,
+    format_load_report,
+)
+from infermark.histogram import (
+    HistogramConfig,
+    HistogramData,
+    LatencyHistogram,
+    compute_bins,
+    format_histogram_report,
+)
 
 __version__ = "0.2.0"
 
@@ -67,4 +81,16 @@ __all__ = [
     "VLLMBackend",
     "TGIBackend",
     "detect_backend",
+    # Load testing
+    "LoadProfile",
+    "LoadResult",
+    "LoadTestPlan",
+    "LoadTestRunner",
+    "format_load_report",
+    # Histogram
+    "HistogramConfig",
+    "HistogramData",
+    "LatencyHistogram",
+    "compute_bins",
+    "format_histogram_report",
 ]
