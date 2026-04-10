@@ -23,6 +23,13 @@ from infermark.report import (
     save_json,
 )
 from infermark.runner import run_benchmark, run_benchmark_async
+from infermark.backends import (
+    Backend,
+    OpenAIBackend,
+    VLLMBackend,
+    TGIBackend,
+    detect_backend,
+)
 
 __version__ = "0.1.0"
 
@@ -54,4 +61,10 @@ __all__ = [
     # Compare
     "compare_reports",
     "format_comparison_text",
+    # Backends
+    "Backend",
+    "OpenAIBackend",
+    "VLLMBackend",
+    "TGIBackend",
+    "detect_backend",
 ]
