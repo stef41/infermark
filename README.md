@@ -1,5 +1,9 @@
 # infermark
 
+[![CI](https://github.com/stef41/infermark/actions/workflows/ci.yml/badge.svg)](https://github.com/stef41/infermark/actions/workflows/ci.yml)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
+
 **Know how fast your LLM endpoint actually is.**
 
 infermark benchmarks any OpenAI-compatible API endpoint — vLLM, TGI, Ollama, SGLang, or anything behind `/v1/chat/completions`. It measures what matters: time to first token, inter-token latency, throughput under load, and tail latencies. One command, no config files, real numbers.
