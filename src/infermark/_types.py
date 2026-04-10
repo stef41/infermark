@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any
 
 
 class BenchmarkMode(str, Enum):
@@ -23,13 +24,13 @@ class BenchmarkConfig:
     model: str = ""
     prompt: str = "Explain the theory of relativity in simple terms."
     max_tokens: int = 256
-    concurrency_levels: List[int] = field(default_factory=lambda: [1, 4, 8, 16, 32])
+    concurrency_levels: list[int] = field(default_factory=lambda: [1, 4, 8, 16, 32])
     n_requests: int = 100
     timeout: float = 120.0
     mode: BenchmarkMode = BenchmarkMode.STREAMING
     warmup: int = 3
     api_key: str = ""
-    extra_body: Dict[str, Any] = field(default_factory=dict)
+    extra_body: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self.url = self.url.rstrip("/")
@@ -52,11 +53,11 @@ class RequestResult:
 
     success: bool
     latency: float  # total end-to-end seconds
-    ttft: Optional[float] = None  # time to first token (streaming only)
-    itl: List[float] = field(default_factory=list)  # inter-token latencies
+    ttft: float | None = None  # time to first token (streaming only)
+    itl: list[float] = field(default_factory=list)  # inter-token latencies
     output_tokens: int = 0
     input_tokens: int = 0
-    error: Optional[str] = None
+    error: str | None = None
 
     @property
     def tokens_per_second(self) -> float:
@@ -92,9 +93,9 @@ class ConcurrencyResult:
     requests_per_second: float
     tokens_per_second: float
     latency: LatencyStats
-    ttft: Optional[LatencyStats] = None
-    itl: Optional[LatencyStats] = None
-    errors: Dict[str, int] = field(default_factory=dict)
+    ttft: LatencyStats | None = None
+    itl: LatencyStats | None = None
+    errors: dict[str, int] = field(default_factory=dict)
 
 
 @dataclass
@@ -104,8 +105,8 @@ class BenchmarkReport:
     url: str
     model: str
     timestamp: str
-    results: List[ConcurrencyResult]
-    config: Dict[str, Any] = field(default_factory=dict)
+    results: list[ConcurrencyResult]
+    config: dict[str, Any] = field(default_factory=dict)
 
     def best_throughput(self) -> ConcurrencyResult:
         """Return the concurrency level with the highest throughput."""
@@ -133,7 +134,7 @@ def percentile(values: Sequence[float], p: float) -> float:
 def compute_percentiles(
     values: Sequence[float],
     percentiles: Sequence[float] = (50, 75, 90, 95, 99),
-) -> Dict[float, float]:
+) -> dict[float, float]:
     """Compute arbitrary percentiles from a sequence of values.
 
     Parameters

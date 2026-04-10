@@ -3,8 +3,6 @@
 import csv
 import io
 
-import pytest
-
 from infermark._types import (
     BenchmarkReport,
     ConcurrencyResult,

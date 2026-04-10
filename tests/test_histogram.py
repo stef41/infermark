@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import math
-
 import pytest
 
 from infermark.histogram import (
@@ -13,7 +11,6 @@ from infermark.histogram import (
     compute_bins,
     format_histogram_report,
 )
-
 
 # ---------------------------------------------------------------------------
 # HistogramConfig

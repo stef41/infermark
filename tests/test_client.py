@@ -1,6 +1,5 @@
 """Tests for infermark.client — SSE parsing and request building."""
 
-import json
 
 from infermark.client import (
     _build_headers,

@@ -6,7 +6,7 @@ import csv
 import io
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from infermark._types import BenchmarkReport, ConcurrencyResult, LatencyStats
 
@@ -21,7 +21,7 @@ def _fmt_tps(tps: float) -> str:
     return f"{tps:.1f}"
 
 
-def _stats_row(label: str, stats: Optional[LatencyStats]) -> Dict[str, str]:
+def _stats_row(label: str, stats: LatencyStats | None) -> dict[str, str]:
     if stats is None:
         return {label: "N/A"}
     return {
@@ -120,9 +120,9 @@ def format_report_rich(report: BenchmarkReport) -> str:
     return console.export_text()
 
 
-def report_to_dict(report: BenchmarkReport) -> Dict[str, Any]:
+def report_to_dict(report: BenchmarkReport) -> dict[str, Any]:
     """Convert a report to a serializable dict."""
-    def _stats_dict(s: Optional[LatencyStats]) -> Optional[Dict[str, float]]:
+    def _stats_dict(s: LatencyStats | None) -> dict[str, float] | None:
         if s is None:
             return None
         return {
@@ -154,7 +154,7 @@ def report_to_dict(report: BenchmarkReport) -> Dict[str, Any]:
     }
 
 
-def save_json(report: BenchmarkReport, path: Union[str, Path]) -> None:
+def save_json(report: BenchmarkReport, path: str | Path) -> None:
     """Save report as JSON."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -162,17 +162,17 @@ def save_json(report: BenchmarkReport, path: Union[str, Path]) -> None:
         json.dump(report_to_dict(report), f, indent=2)
 
 
-def load_json(path: Union[str, Path]) -> Dict[str, Any]:
+def load_json(path: str | Path) -> dict[str, Any]:
     """Load a JSON report from disk."""
     with open(path) as f:
-        return json.load(f)
+        return dict(json.load(f))
 
 
 def format_markdown(report: BenchmarkReport) -> str:
     """Format report as a Markdown table."""
     lines: list[str] = []
-    lines.append(f"# Benchmark Report")
-    lines.append(f"")
+    lines.append("# Benchmark Report")
+    lines.append("")
     lines.append(f"- **URL:** {report.url}")
     lines.append(f"- **Model:** {report.model}")
     lines.append(f"- **Time:** {report.timestamp}")
@@ -204,9 +204,9 @@ _CSV_FIELDS = [
 ]
 
 
-def _result_to_csv_row(report: BenchmarkReport, r: ConcurrencyResult) -> Dict[str, Any]:
+def _result_to_csv_row(report: BenchmarkReport, r: ConcurrencyResult) -> dict[str, Any]:
     """Convert a single ConcurrencyResult into a flat CSV row dict."""
-    row: Dict[str, Any] = {
+    row: dict[str, Any] = {
         "url": report.url,
         "model": report.model,
         "timestamp": report.timestamp,
@@ -248,7 +248,7 @@ def format_csv(report: BenchmarkReport) -> str:
     return buf.getvalue()
 
 
-def save_csv(report: BenchmarkReport, path: Union[str, Path]) -> None:
+def save_csv(report: BenchmarkReport, path: str | Path) -> None:
     """Save report as CSV."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -1,11 +1,10 @@
 """CLI for infermark."""
 
 from __future__ import annotations
+from typing import Any
 
-import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 try:
     import click
@@ -20,12 +19,12 @@ except ImportError:
     _console = None  # type: ignore[assignment]
 
 
-def _build_cli():  # type: ignore[no-untyped-def]
+def _build_cli() -> Any:
     if not _HAS_CLICK:
         return None
 
     from infermark._types import BenchmarkConfig, BenchmarkMode
-    from infermark.report import format_report_rich, format_report_text, save_json, format_markdown
+    from infermark.report import format_markdown, format_report_rich, format_report_text, save_json
     from infermark.runner import run_benchmark
 
     @click.group()
@@ -52,13 +51,13 @@ def _build_cli():  # type: ignore[no-untyped-def]
         requests: int,
         concurrency: str,
         max_tokens: int,
-        prompt: Optional[str],
+        prompt: str | None,
         mode: str,
         warmup: int,
         timeout: float,
         api_key: str,
-        output: Optional[str],
-        markdown: Optional[str],
+        output: str | None,
+        markdown: str | None,
     ) -> None:
         """Run a benchmark against an endpoint."""
         levels = [int(x.strip()) for x in concurrency.split(",")]
@@ -93,10 +92,7 @@ def _build_cli():  # type: ignore[no-untyped-def]
         report = run_benchmark(config, on_progress=on_progress)
 
         click.echo("")
-        if _console is not None:
-            text = format_report_rich(report)
-        else:
-            text = format_report_text(report)
+        text = format_report_rich(report) if _console is not None else format_report_text(report)
         click.echo(text)
 
         if output:
@@ -111,8 +107,11 @@ def _build_cli():  # type: ignore[no-untyped-def]
     @click.argument("files", nargs=-1, required=True, type=click.Path(exists=True))
     def compare(files: tuple) -> None:  # type: ignore[type-arg]
         """Compare multiple JSON reports."""
-        from infermark.report import load_json, report_to_dict
-        from infermark.compare import format_comparison_text, format_comparison_rich, compare_reports
+        from infermark.compare import (
+            format_comparison_rich,
+            format_comparison_text,
+        )
+        from infermark.report import load_json
 
         reports = []
         for f in files:

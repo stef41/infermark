@@ -1,9 +1,7 @@
 """Tests for infermark.runner — aggregate logic (no real HTTP)."""
 
 from infermark._types import (
-    ConcurrencyResult,
     RequestResult,
-    LatencyStats,
 )
 from infermark.runner import _aggregate_results
 

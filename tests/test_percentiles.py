@@ -2,7 +2,7 @@
 
 import pytest
 
-from infermark._types import compute_percentiles, compute_stats, percentile, LatencyStats
+from infermark._types import compute_percentiles, compute_stats, percentile
 
 
 class TestComputePercentiles:

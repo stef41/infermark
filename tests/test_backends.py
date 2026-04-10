@@ -3,30 +3,21 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict
+from typing import Any
 from unittest.mock import MagicMock, patch
-from http.client import HTTPResponse
-from io import BytesIO
-
-import pytest
 
 from infermark.backends import (
-    Backend,
     OpenAIBackend,
-    VLLMBackend,
     TGIBackend,
+    VLLMBackend,
     detect_backend,
-    _http_post,
-    _http_get,
 )
-from infermark._types import RequestResult
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _mock_urlopen(response_body: Dict[str, Any], status: int = 200):
+def _mock_urlopen(response_body: dict[str, Any], status: int = 200):
     """Return a context-manager mock for urllib.request.urlopen."""
     body = json.dumps(response_body).encode()
     mock_resp = MagicMock()
@@ -191,7 +182,7 @@ class TestDetectBackend:
 
     @patch("infermark.backends._http_get")
     def test_detect_vllm(self, mock_get: MagicMock) -> None:
-        def side_effect(url: str, timeout: float = 10.0) -> Dict[str, Any]:
+        def side_effect(url: str, timeout: float = 10.0) -> dict[str, Any]:
             if "/info" in url:
                 raise Exception("not found")
             if "/v1/models" in url:
@@ -204,7 +195,7 @@ class TestDetectBackend:
 
     @patch("infermark.backends._http_get")
     def test_detect_openai(self, mock_get: MagicMock) -> None:
-        def side_effect(url: str, timeout: float = 10.0) -> Dict[str, Any]:
+        def side_effect(url: str, timeout: float = 10.0) -> dict[str, Any]:
             if "/info" in url:
                 raise Exception("not found")
             if "/v1/models" in url:

@@ -12,7 +12,28 @@ from infermark._types import (
     compute_stats,
     percentile,
 )
+from infermark.backends import (
+    Backend,
+    OpenAIBackend,
+    TGIBackend,
+    VLLMBackend,
+    detect_backend,
+)
 from infermark.compare import compare_reports, format_comparison_text
+from infermark.histogram import (
+    HistogramConfig,
+    HistogramData,
+    LatencyHistogram,
+    compute_bins,
+    format_histogram_report,
+)
+from infermark.load import (
+    LoadProfile,
+    LoadResult,
+    LoadTestPlan,
+    LoadTestRunner,
+    format_load_report,
+)
 from infermark.report import (
     format_csv,
     format_markdown,
@@ -23,27 +44,6 @@ from infermark.report import (
     save_json,
 )
 from infermark.runner import run_benchmark, run_benchmark_async
-from infermark.backends import (
-    Backend,
-    OpenAIBackend,
-    VLLMBackend,
-    TGIBackend,
-    detect_backend,
-)
-from infermark.load import (
-    LoadProfile,
-    LoadResult,
-    LoadTestPlan,
-    LoadTestRunner,
-    format_load_report,
-)
-from infermark.histogram import (
-    HistogramConfig,
-    HistogramData,
-    LatencyHistogram,
-    compute_bins,
-    format_histogram_report,
-)
 
 __version__ = "0.3.0"
 

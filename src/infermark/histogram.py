@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import math
 import statistics
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Any
 
 
 @dataclass
@@ -32,8 +33,8 @@ class HistogramConfig:
 class HistogramData:
     """Computed histogram data."""
 
-    bin_edges: List[float] = field(default_factory=list)
-    counts: List[int] = field(default_factory=list)
+    bin_edges: list[float] = field(default_factory=list)
+    counts: list[int] = field(default_factory=list)
     total: int = 0
     min_val: float = 0.0
     max_val: float = 0.0
@@ -49,7 +50,7 @@ class HistogramData:
 def compute_bins(
     values: Sequence[float],
     n_bins: int,
-) -> Tuple[List[float], List[int]]:
+) -> tuple[list[float], list[int]]:
     """Compute histogram bin edges and counts.
 
     Returns ``(edges, counts)`` where ``len(edges) == n_bins + 1`` and
@@ -92,7 +93,7 @@ class LatencyHistogram:
         Optional :class:`HistogramConfig`.
     """
 
-    def __init__(self, config: Optional[HistogramConfig] = None) -> None:
+    def __init__(self, config: HistogramConfig | None = None) -> None:
         self.config = config or HistogramConfig()
 
     # -- public API ---------------------------------------------------------
@@ -124,7 +125,7 @@ class LatencyHistogram:
 
         max_count = max(data.counts)
         bar_width = self.config.width
-        lines: List[str] = []
+        lines: list[str] = []
 
         for i, count in enumerate(data.counts):
             lo = data.bin_edges[i]
@@ -147,7 +148,7 @@ class LatencyHistogram:
         self,
         latencies: Sequence[float],
         pcts: Sequence[int] = (50, 90, 95, 99),
-    ) -> Dict[int, float]:
+    ) -> dict[int, float]:
         """Compute latency percentiles.
 
         Uses linear interpolation.
@@ -157,7 +158,7 @@ class LatencyHistogram:
 
         sorted_vals = sorted(latencies)
         n = len(sorted_vals)
-        result: Dict[int, float] = {}
+        result: dict[int, float] = {}
 
         for p in pcts:
             if n == 1:
@@ -185,7 +186,7 @@ class LatencyHistogram:
 
         # Sample up to `width` points along the CDF
         n_steps = min(width, n)
-        lines: List[str] = []
+        lines: list[str] = []
         lines.append(f"CDF ({unit})")
         lines.append("-" * (width + 20))
 
@@ -199,7 +200,7 @@ class LatencyHistogram:
 
         return "\n".join(lines)
 
-    def summary(self, latencies: Sequence[float]) -> dict:
+    def summary(self, latencies: Sequence[float]) -> dict[str, Any]:
         """Return a statistical summary as a plain dict."""
         if not latencies:
             return {
@@ -232,7 +233,7 @@ class LatencyHistogram:
 
 def format_histogram_report(
     data: HistogramData,
-    config: Optional[HistogramConfig] = None,
+    config: HistogramConfig | None = None,
 ) -> str:
     """Return a full histogram report as a string."""
     cfg = config or HistogramConfig()

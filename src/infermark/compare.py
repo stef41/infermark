@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-from infermark._types import BenchmarkReport, ConcurrencyResult, LatencyStats
+from infermark._types import BenchmarkReport, ConcurrencyResult
 
 
 def _find_matching_concurrency(
     report: BenchmarkReport, concurrency: int
-) -> Optional[ConcurrencyResult]:
+) -> ConcurrencyResult | None:
     """Find the result for a specific concurrency level."""
     for r in report.results:
         if r.concurrency == concurrency:
@@ -17,7 +17,7 @@ def _find_matching_concurrency(
     return None
 
 
-def compare_reports(reports: List[BenchmarkReport]) -> Dict[str, Any]:
+def compare_reports(reports: list[BenchmarkReport]) -> dict[str, Any]:
     """Compare multiple reports, returning a structured comparison.
 
     Returns a dict keyed by concurrency level, with per-endpoint metrics.
@@ -30,7 +30,7 @@ def compare_reports(reports: List[BenchmarkReport]) -> Dict[str, Any]:
         for r in report.results:
             all_levels.add(r.concurrency)
 
-    comparison: Dict[str, Any] = {}
+    comparison: dict[str, Any] = {}
     for level in sorted(all_levels):
         entries: list[dict[str, Any]] = []
         for report in reports:
@@ -54,7 +54,7 @@ def compare_reports(reports: List[BenchmarkReport]) -> Dict[str, Any]:
     return comparison
 
 
-def format_comparison_text(reports: List[BenchmarkReport]) -> str:
+def format_comparison_text(reports: list[BenchmarkReport]) -> str:
     """Format a side-by-side comparison as text."""
     if not reports:
         return "No reports to compare."
@@ -92,7 +92,7 @@ def format_comparison_text(reports: List[BenchmarkReport]) -> str:
     return "\n".join(lines)
 
 
-def format_comparison_rich(reports: List[BenchmarkReport]) -> str:
+def format_comparison_rich(reports: list[BenchmarkReport]) -> str:
     """Format comparison using rich (returns rendered text)."""
     try:
         from rich.console import Console

@@ -1,7 +1,6 @@
 """Tests for infermark.report."""
 
 import json
-import pytest
 
 from infermark._types import (
     BenchmarkReport,
@@ -11,9 +10,9 @@ from infermark._types import (
 from infermark.report import (
     format_markdown,
     format_report_text,
+    load_json,
     report_to_dict,
     save_json,
-    load_json,
 )
 
 

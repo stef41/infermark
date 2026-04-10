@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import time
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import httpx
 
@@ -20,7 +20,7 @@ from infermark.client import send_request
 
 
 def _aggregate_results(
-    results: List[RequestResult],
+    results: list[RequestResult],
     concurrency: int,
     total_duration: float,
 ) -> ConcurrencyResult:
@@ -29,7 +29,7 @@ def _aggregate_results(
     failures = [r for r in results if not r.success]
 
     # Error breakdown
-    error_counts: Dict[str, int] = {}
+    error_counts: dict[str, int] = {}
     for r in failures:
         key = (r.error or "unknown").split(":")[0]
         error_counts[key] = error_counts.get(key, 0) + 1
@@ -116,7 +116,7 @@ async def _warmup(config: BenchmarkConfig, client: httpx.AsyncClient) -> None:
 
 async def run_benchmark_async(
     config: BenchmarkConfig,
-    on_progress: Optional[Any] = None,
+    on_progress: Any | None = None,
 ) -> BenchmarkReport:
     """Run a full benchmark across all concurrency levels.
 
@@ -156,7 +156,7 @@ async def run_benchmark_async(
 
 def run_benchmark(
     config: BenchmarkConfig,
-    on_progress: Optional[Any] = None,
+    on_progress: Any | None = None,
 ) -> BenchmarkReport:
     """Synchronous wrapper for run_benchmark_async."""
     return asyncio.run(run_benchmark_async(config, on_progress))

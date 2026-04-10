@@ -1,6 +1,5 @@
 """Tests for infermark.cli."""
 
-import json
 import pytest
 
 try:
@@ -14,8 +13,8 @@ from infermark._types import (
     ConcurrencyResult,
     LatencyStats,
 )
-from infermark.report import save_json
 from infermark.cli import _build_cli
+from infermark.report import save_json
 
 pytestmark = pytest.mark.skipif(not _HAS_CLICK, reason="click not installed")
 

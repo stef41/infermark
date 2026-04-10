@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import time
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import httpx
 
@@ -16,10 +16,10 @@ def _build_payload(
     prompt: str,
     max_tokens: int,
     stream: bool,
-    extra_body: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    extra_body: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Build the chat completions request payload."""
-    payload: Dict[str, Any] = {
+    payload: dict[str, Any] = {
         "model": model,
         "messages": [{"role": "user", "content": prompt}],
         "max_tokens": max_tokens,
@@ -30,14 +30,14 @@ def _build_payload(
     return payload
 
 
-def _build_headers(api_key: str) -> Dict[str, str]:
-    headers: Dict[str, str] = {"Content-Type": "application/json"}
+def _build_headers(api_key: str) -> dict[str, str]:
+    headers: dict[str, str] = {"Content-Type": "application/json"}
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
     return headers
 
 
-def _parse_sse_line(line: str) -> Optional[Dict[str, Any]]:
+def _parse_sse_line(line: str) -> dict[str, Any] | None:
     """Parse a single SSE data line, returning the JSON payload or None."""
     line = line.strip()
     if not line or not line.startswith("data:"):
@@ -46,31 +46,31 @@ def _parse_sse_line(line: str) -> Optional[Dict[str, Any]]:
     if data == "[DONE]":
         return None
     try:
-        return json.loads(data)
+        return dict(json.loads(data))
     except json.JSONDecodeError:
         return None
 
 
-def _extract_token_from_chunk(chunk: Dict[str, Any]) -> Optional[str]:
+def _extract_token_from_chunk(chunk: dict[str, Any]) -> str | None:
     """Extract the content delta from a streaming chunk."""
     choices = chunk.get("choices", [])
     if not choices:
         return None
     delta = choices[0].get("delta", {})
-    return delta.get("content")
+    return str(delta["content"]) if "content" in delta else None
 
 
 async def send_streaming_request(
     client: httpx.AsyncClient,
     url: str,
-    payload: Dict[str, Any],
-    headers: Dict[str, str],
+    payload: dict[str, Any],
+    headers: dict[str, str],
     timeout: float,
 ) -> RequestResult:
     """Send a streaming request and measure TTFT and ITL."""
     start = time.perf_counter()
-    first_token_time: Optional[float] = None
-    last_token_time: Optional[float] = None
+    first_token_time: float | None = None
+    last_token_time: float | None = None
     itl: list[float] = []
     output_tokens = 0
 
@@ -141,8 +141,8 @@ async def send_streaming_request(
 async def send_non_streaming_request(
     client: httpx.AsyncClient,
     url: str,
-    payload: Dict[str, Any],
-    headers: Dict[str, str],
+    payload: dict[str, Any],
+    headers: dict[str, str],
     timeout: float,
 ) -> RequestResult:
     """Send a non-streaming request and measure latency."""
@@ -199,7 +199,7 @@ async def send_request(
     mode: BenchmarkMode,
     api_key: str = "",
     timeout: float = 120.0,
-    extra_body: Optional[Dict[str, Any]] = None,
+    extra_body: dict[str, Any] | None = None,
 ) -> RequestResult:
     """Send a single benchmark request."""
     stream = mode == BenchmarkMode.STREAMING

@@ -5,8 +5,7 @@ from __future__ import annotations
 import json
 import time
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
-from urllib.error import URLError
+from typing import Any
 from urllib.request import Request, urlopen
 
 from infermark._types import RequestResult
@@ -16,7 +15,7 @@ class Backend(ABC):
     """Base class for LLM inference backends."""
 
     @abstractmethod
-    def send_request(self, prompt: str, config: Dict[str, Any]) -> RequestResult:
+    def send_request(self, prompt: str, config: dict[str, Any]) -> RequestResult:
         """Send a single inference request.
 
         Parameters
@@ -39,20 +38,20 @@ class Backend(ABC):
         ...
 
 
-def _http_post(url: str, payload: Dict[str, Any], headers: Dict[str, str],
-               timeout: float = 120.0) -> Dict[str, Any]:
+def _http_post(url: str, payload: dict[str, Any], headers: dict[str, str],
+               timeout: float = 120.0) -> dict[str, Any]:
     """Perform a synchronous HTTP POST and return the parsed JSON response."""
     data = json.dumps(payload).encode()
     req = Request(url, data=data, headers=headers, method="POST")
     with urlopen(req, timeout=timeout) as resp:  # noqa: S310
-        return json.loads(resp.read().decode())
+        return dict(json.loads(resp.read().decode()))
 
 
-def _http_get(url: str, timeout: float = 10.0) -> Dict[str, Any]:
+def _http_get(url: str, timeout: float = 10.0) -> dict[str, Any]:
     """Perform a synchronous HTTP GET and return the parsed JSON response."""
     req = Request(url, method="GET")
     with urlopen(req, timeout=timeout) as resp:  # noqa: S310
-        return json.loads(resp.read().decode())
+        return dict(json.loads(resp.read().decode()))
 
 
 class OpenAIBackend(Backend):
@@ -67,13 +66,13 @@ class OpenAIBackend(Backend):
     def backend_name(self) -> str:
         return "openai"
 
-    def send_request(self, prompt: str, config: Dict[str, Any]) -> RequestResult:
+    def send_request(self, prompt: str, config: dict[str, Any]) -> RequestResult:
         endpoint = f"{self.url}/v1/chat/completions"
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
+        headers: dict[str, str] = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
             "max_tokens": config.get("max_tokens", 256),
@@ -117,11 +116,11 @@ class VLLMBackend(Backend):
     def backend_name(self) -> str:
         return "vllm"
 
-    def send_request(self, prompt: str, config: Dict[str, Any]) -> RequestResult:
+    def send_request(self, prompt: str, config: dict[str, Any]) -> RequestResult:
         endpoint = f"{self.url}/v1/completions"
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
+        headers: dict[str, str] = {"Content-Type": "application/json"}
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "model": self.model,
             "prompt": prompt,
             "max_tokens": config.get("max_tokens", 256),
@@ -174,11 +173,11 @@ class TGIBackend(Backend):
     def backend_name(self) -> str:
         return "tgi"
 
-    def send_request(self, prompt: str, config: Dict[str, Any]) -> RequestResult:
+    def send_request(self, prompt: str, config: dict[str, Any]) -> RequestResult:
         endpoint = f"{self.url}/generate"
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
+        headers: dict[str, str] = {"Content-Type": "application/json"}
 
-        parameters: Dict[str, Any] = {
+        parameters: dict[str, Any] = {
             "max_new_tokens": config.get("max_tokens", 256),
             "temperature": config.get("temperature", 1.0),
         }
@@ -189,7 +188,7 @@ class TGIBackend(Backend):
         if "repetition_penalty" in config:
             parameters["repetition_penalty"] = config["repetition_penalty"]
 
-        payload: Dict[str, Any] = {
+        payload: dict[str, Any] = {
             "inputs": prompt,
             "parameters": parameters,
         }

@@ -10,8 +10,8 @@ from __future__ import annotations
 import statistics
 import threading
 import time
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import Any, Callable
 
 
 @dataclass
@@ -45,7 +45,7 @@ class LoadResult:
     rps: float
     latency_ms: float
     success: bool
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class LoadTestPlan:
@@ -91,11 +91,11 @@ class LoadTestPlan:
 
         return p.initial_rps
 
-    def schedule(self) -> List[Tuple[float, float]]:
+    def schedule(self) -> list[tuple[float, float]]:
         """Return ``(time_offset, target_rps)`` pairs at 0.1 s granularity."""
         step = 0.1
         total = self.total_duration
-        points: List[Tuple[float, float]] = []
+        points: list[tuple[float, float]] = []
         t = 0.0
         while t <= total:
             points.append((round(t, 3), self.rps_at(t)))
@@ -121,14 +121,13 @@ class LoadTestRunner:
     def __init__(self, plan: LoadTestPlan, fn: Callable[[], Any]) -> None:
         self.plan = plan
         self.fn = fn
-        self._results: List[LoadResult] = []
+        self._results: list[LoadResult] = []
         self._lock = threading.Lock()
 
     # ------------------------------------------------------------------
-    def run_sync(self) -> List[LoadResult]:
+    def run_sync(self) -> list[LoadResult]:
         """Execute the load test synchronously and return all results."""
         self._results = []
-        profile = self.plan.profile
         total = self.plan.total_duration
         if total <= 0:
             return self._results
@@ -163,7 +162,7 @@ class LoadTestRunner:
         return list(self._results)
 
     # ------------------------------------------------------------------
-    def summary(self) -> Dict[str, Any]:
+    def summary(self) -> dict[str, Any]:
         """Aggregate results into a summary dict."""
         results = self._results
         if not results:
@@ -225,7 +224,7 @@ class LoadTestRunner:
 # Percentile helper (stdlib only)
 # ======================================================================
 
-def _percentile(sorted_data: List[float], pct: float) -> float:
+def _percentile(sorted_data: list[float], pct: float) -> float:
     """Return the *pct*-th percentile (nearest-rank) from sorted data."""
     if not sorted_data:
         return 0.0
@@ -237,7 +236,7 @@ def _percentile(sorted_data: List[float], pct: float) -> float:
 # Report formatting
 # ======================================================================
 
-def format_load_report(summary: Dict[str, Any]) -> str:
+def format_load_report(summary: dict[str, Any]) -> str:
     """Format a load-test summary dict into a human-readable string."""
     if not summary or summary.get("total_requests", 0) == 0:
         return "No load test results."
