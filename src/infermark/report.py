@@ -1,7 +1,9 @@
-"""Report formatting — rich terminal output, JSON, and markdown."""
+"""Report formatting — rich terminal output, JSON, CSV, and markdown."""
 
 from __future__ import annotations
 
+import csv
+import io
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
@@ -189,3 +191,69 @@ def format_markdown(report: BenchmarkReport) -> str:
         )
 
     return "\n".join(lines)
+
+
+_CSV_FIELDS = [
+    "url", "model", "timestamp",
+    "concurrency", "n_requests", "n_success", "n_error",
+    "total_duration", "requests_per_second", "tokens_per_second",
+    "latency_mean_ms", "latency_p50_ms", "latency_p95_ms", "latency_p99_ms",
+    "latency_min_ms", "latency_max_ms",
+    "ttft_mean_ms", "ttft_p50_ms", "ttft_p95_ms", "ttft_p99_ms",
+    "itl_mean_ms", "itl_p50_ms", "itl_p95_ms", "itl_p99_ms",
+]
+
+
+def _result_to_csv_row(report: BenchmarkReport, r: ConcurrencyResult) -> Dict[str, Any]:
+    """Convert a single ConcurrencyResult into a flat CSV row dict."""
+    row: Dict[str, Any] = {
+        "url": report.url,
+        "model": report.model,
+        "timestamp": report.timestamp,
+        "concurrency": r.concurrency,
+        "n_requests": r.n_requests,
+        "n_success": r.n_success,
+        "n_error": r.n_error,
+        "total_duration": round(r.total_duration, 4),
+        "requests_per_second": round(r.requests_per_second, 2),
+        "tokens_per_second": round(r.tokens_per_second, 2),
+        "latency_mean_ms": round(r.latency.mean * 1000, 2),
+        "latency_p50_ms": round(r.latency.p50 * 1000, 2),
+        "latency_p95_ms": round(r.latency.p95 * 1000, 2),
+        "latency_p99_ms": round(r.latency.p99 * 1000, 2),
+        "latency_min_ms": round(r.latency.min * 1000, 2),
+        "latency_max_ms": round(r.latency.max * 1000, 2),
+    }
+    for prefix, stats in [("ttft", r.ttft), ("itl", r.itl)]:
+        if stats is not None:
+            row[f"{prefix}_mean_ms"] = round(stats.mean * 1000, 2)
+            row[f"{prefix}_p50_ms"] = round(stats.p50 * 1000, 2)
+            row[f"{prefix}_p95_ms"] = round(stats.p95 * 1000, 2)
+            row[f"{prefix}_p99_ms"] = round(stats.p99 * 1000, 2)
+        else:
+            row[f"{prefix}_mean_ms"] = ""
+            row[f"{prefix}_p50_ms"] = ""
+            row[f"{prefix}_p95_ms"] = ""
+            row[f"{prefix}_p99_ms"] = ""
+    return row
+
+
+def format_csv(report: BenchmarkReport) -> str:
+    """Format report as a CSV string (one row per concurrency level)."""
+    buf = io.StringIO()
+    writer = csv.DictWriter(buf, fieldnames=_CSV_FIELDS)
+    writer.writeheader()
+    for r in report.results:
+        writer.writerow(_result_to_csv_row(report, r))
+    return buf.getvalue()
+
+
+def save_csv(report: BenchmarkReport, path: Union[str, Path]) -> None:
+    """Save report as CSV."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=_CSV_FIELDS)
+        writer.writeheader()
+        for r in report.results:
+            writer.writerow(_result_to_csv_row(report, r))

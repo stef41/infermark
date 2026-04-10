@@ -13,10 +13,12 @@ from infermark._types import (
 )
 from infermark.compare import compare_reports, format_comparison_text
 from infermark.report import (
+    format_csv,
     format_markdown,
     format_report_text,
     load_json,
     report_to_dict,
+    save_csv,
     save_json,
 )
 from infermark.runner import run_benchmark, run_benchmark_async
@@ -42,9 +44,11 @@ __all__ = [
     # Report
     "format_report_text",
     "format_markdown",
+    "format_csv",
     "report_to_dict",
     "save_json",
     "load_json",
+    "save_csv",
     # Compare
     "compare_reports",
     "format_comparison_text",
