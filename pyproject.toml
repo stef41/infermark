@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "infermark"
-version = "0.2.0"
+version = "0.3.0"
 description = "Benchmark any OpenAI-compatible LLM endpoint. TTFT, inter-token latency, throughput, P50-P99 — in one command."
 readme = "README.md"
 license = {text = "Apache-2.0"}
