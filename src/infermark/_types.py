@@ -130,6 +130,31 @@ def percentile(values: Sequence[float], p: float) -> float:
     return sorted_v[f] * (c - k) + sorted_v[c] * (k - f)
 
 
+def compute_percentiles(
+    values: Sequence[float],
+    percentiles: Sequence[float] = (50, 75, 90, 95, 99),
+) -> Dict[float, float]:
+    """Compute arbitrary percentiles from a sequence of values.
+
+    Parameters
+    ----------
+    values:
+        Raw latency (or other metric) values.
+    percentiles:
+        Which percentiles to compute.  Each value must be in [0, 100].
+
+    Returns
+    -------
+    Dict mapping each requested percentile to its computed value.
+    """
+    if not values:
+        return {p: 0.0 for p in percentiles}
+    for p in percentiles:
+        if not 0 <= p <= 100:
+            raise ValueError(f"percentile must be in [0, 100], got {p}")
+    return {p: percentile(values, p) for p in percentiles}
+
+
 def compute_stats(values: Sequence[float]) -> LatencyStats:
     """Compute latency statistics from a list of values."""
     if not values:

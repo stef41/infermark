@@ -8,6 +8,7 @@ from infermark._types import (
     InfermarkError,
     LatencyStats,
     RequestResult,
+    compute_percentiles,
     compute_stats,
     percentile,
 )
@@ -36,6 +37,7 @@ __all__ = [
     "RequestResult",
     "InfermarkError",
     # Stats
+    "compute_percentiles",
     "compute_stats",
     "percentile",
     # Runner
