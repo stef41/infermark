@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use infermark in your research, please cite it as below."
+type: software
+title: "infermark"
+abstract: "Inference benchmarking for OpenAI-compatible LLM endpoints."
+authors:
+  - family-names: "B"
+    given-names: "Zacharie"
+    alias: "stef41"
+version: "0.3.0"
+date-released: "2026-04-11"
+license: Apache-2.0
+url: "https://github.com/stef41/infermark"
+repository-code: "https://github.com/stef41/infermark"
+keywords:
+  - benchmarking
+  - inference
+  - llm
+  - python
